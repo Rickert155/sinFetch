@@ -1,4 +1,10 @@
-import shutil
+import shutil, subprocess
+
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+BLUE = "\033[34m"
+RESET = "\033[0m"
 
 MEMINFO_FILE = '/proc/meminfo'
 CPUINFO_FILE = '/proc/cpuinfo'
@@ -55,20 +61,33 @@ def getCPUInfo():
 
     return cpu_model, cpu_core
 
+def getGPUInfo():
+    command = 'lspci | grep -E "VGA|3D"'
+    gpu = run_command(command=command)
+    gpu = gpu.split(': ')[1]
+    return gpu
+
+def run_command(command:str):
+    result = subprocess.run(command, capture_output=True, text=True, shell=True)
+    return result.stdout.strip()
+
 
 def showSystemInfo():
     memTotal, memAvailable, memFree =  getMemInfo()
-    
     cpu_model, cpu_core = getCPUInfo()
+    gpu = getGPUInfo()
     
     divide_line = (shutil.get_terminal_size().columns - 3)*('-')
 
     print(
-            f'-{divide_line}\n'
-            f'| Memory:\t{memAvailable} MB / {memTotal} MB\n'
-            f'|{divide_line}\n'
-            f'| CPU:\t\t{cpu_model}\n'
-            f'| Core:\t\t{cpu_core}\n'
+            f'{RED}-{divide_line}\n{RESET}'
+            f'{RED}|{RESET} Memory:\t{memAvailable} MB / {memTotal} MB\n'
+            f'{RED}|{divide_line}\n{RESET}'
+            f'{RED}|{RESET} CPU:\t\t{cpu_model}\n'
+            f'{RED}|{RESET} Core:\t\t{cpu_core}\n'
+            f'{RED}-{divide_line}\n{RESET}'
+            f'{RED}|{RESET} GPU:\t\t{gpu}\n'
+            f'{RED}-{divide_line}\n{RESET}\n'
             )
 
 
