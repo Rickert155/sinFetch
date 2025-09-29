@@ -67,17 +67,29 @@ def getGPUInfo():
     gpu = gpu.split(': ')[1]
     return gpu
 
+def getWM():
+    commands = ['echo $XDG_SESSION_DESKTOP', 'echo $DESKTOP_SESSION']
+    wm = run_command(command=commands[0])
+    if len(wm) < 1:
+        wm = run_command(command=commands[1])
+    return wm
+
 def run_command(command:str):
     result = subprocess.run(command, capture_output=True, text=True, shell=True)
     return result.stdout.strip()
 
 
+def run_command(command:str):
+    result = subprocess.run(command, capture_output=True, text=True, shell=True)
+    return result.stdout.strip()
+
 def showSystemInfo():
     memTotal, memAvailable, memFree =  getMemInfo()
     cpu_model, cpu_core = getCPUInfo()
     gpu = getGPUInfo()
-    
-    divide_line = (shutil.get_terminal_size().columns - 3)*('-')
+    wm = getWM()
+
+    divide_line = (shutil.get_terminal_size().columns - 2)*('-')
 
     print(
             f'{RED}-{divide_line}\n{RESET}'
@@ -87,7 +99,9 @@ def showSystemInfo():
             f'{RED}|{RESET} Core:\t\t{cpu_core}\n'
             f'{RED}-{divide_line}\n{RESET}'
             f'{RED}|{RESET} GPU:\t\t{gpu}\n'
-            f'{RED}-{divide_line}\n{RESET}\n'
+            f'{RED}-{divide_line}\n{RESET}'
+            f'{RED}|{RESET} WM:\t\t{wm}\n'
+            f'{RED}-{divide_line}\n{RESET}'
             )
 
 
