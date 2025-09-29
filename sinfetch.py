@@ -1,4 +1,7 @@
+import shutil
+
 MEMINFO_FILE = '/proc/meminfo'
+CPUINFO_FILE = '/proc/cpuinfo'
 
 def parseLine(line:str, pattern:str):
     kb = 'kB'
@@ -11,7 +14,6 @@ def getMemInfo():
     memTotal = None
     memAvailable = None
     memFree = None
-
 
     with open(MEMINFO_FILE, 'r') as file:
         for line in file:
@@ -32,18 +34,41 @@ def getMemInfo():
                 memCached = parseLine(line=line, pattern=memCachedPattern)
             if memInactivePattern in line:
                 memFree = parseLine(line=line, pattern=memInactivePattern)
-    
     memAvailable = round(memTotal - memAvailable - memBuffers - memCached, 1) 
-
     return memTotal, memAvailable, memFree
+
+def getCPUInfo():
+    cpu_model = None 
+    cpu_core = 0 
+    
+    patternLineModeleName = 'model name'
+    patternLineCore = 'processo'
+
+    with open(CPUINFO_FILE, 'r') as file:
+        for line in file.readlines():
+            line = line.strip()
+            if patternLineModeleName in line:
+                cpu_model = line.split(': ')[1].strip()
+            if patternLineCore in line:
+                cpu_core+=1
+
+
+    return cpu_model, cpu_core
 
 
 def showSystemInfo():
     memTotal, memAvailable, memFree =  getMemInfo()
+    
+    cpu_model, cpu_core = getCPUInfo()
+    
+    divide_line = (shutil.get_terminal_size().columns - 3)*('-')
+
     print(
-            f'Mem Total:\t{memTotal} MB\n'
-            f'Mem Available:\t{memAvailable} MB\n'
-            f'Mem Free:\t{memFree} MB'
+            f'-{divide_line}\n'
+            f'| Memory:\t{memAvailable} MB / {memTotal} MB\n'
+            f'|{divide_line}\n'
+            f'| CPU:\t\t{cpu_model}\n'
+            f'| Core:\t\t{cpu_core}\n'
             )
 
 
