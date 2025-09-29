@@ -89,8 +89,10 @@ def showSystemInfo():
     gpu = getGPUInfo()
     wm = getWM()
 
-    divide_line = (shutil.get_terminal_size().columns - 2)*('-')
+    width_border = 2
 
+    divide_line = (shutil.get_terminal_size().columns - width_border)*('-')
+    
     print(
             f'{RED}-{divide_line}\n{RESET}'
             f'{RED}|{RESET} Memory:\t{memAvailable} MB / {memTotal} MB\n'
